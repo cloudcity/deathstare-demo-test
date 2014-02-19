@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.8.7.3
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'>
+<h1 id="label-WIDGET-TEST">WIDGET-TEST</h1>
+
+<p>A suite of custom performance/stress tests, implemented as a web service,
+designed to
+be deployed to Heroku. For information on writing performance
+test cases, see
+<a href="file.WRITING_TESTS.html" title="Writing Performance Tests">Writing Performance Tests</a>.</p>
+
+<p>Using <a
+href="http://https//github.com/cloudcity/deathstare">Deathstare</a> to
+power the dashboard
+and job runners, this repo contains a Rails app to
+mount Deathstare, a suite of
+performance tests, and some client API glue.</p>
+
+<h2 id="label-Quickstart">Quickstart</h2>
+
+<p>Visit the WIDGET-TEST dashboard:</p>
+
+<pre class="code ruby"><code class="ruby">open https://widget-deathstare-test.herokuapp.com/</code></pre>
+
+<h2 id="label-Development">Development</h2>
+
+<p>NOTE: You&#39;ll need to have Postgres and Redis running before you do
+this.</p>
+
+<p>First start the workers and Rails server, then open the dashboard:</p>
+
+<pre class="code ruby"><code class="ruby">foreman start -p 4000 &amp;     # (Heroku dev sign-in wants port 4000)
+open http://localhost:4000/ # view the test dashboard</code></pre>
+
+<p>You can kick off test runs using the dashboard. The tests run in async
+workers.
+For extra interesting output we (currently) recommend you watch
+the worker logs while the
+test is running.</p>
+
+<p>To view the documentation in your browser, with the dashboard running:</p>
+
+<pre class="code ruby"><code class="ruby">rake yard
+open http://localhost:4000/doc</code></pre>
+
+<h3 id="label-Web+Dashboard">Web Dashboard</h3>
+
+<p>There&#39;s a Rails app that provides a web interface to run a given set of
+tests
+in parallel on Heroku with a configurable number of instances and
+will
+report back results.</p>
+
+<p>To run this app locally, copy <code>/config/database-sample.yml</code> to
+<code>/config/database.yml</code> and
+provide Postgres credentials for your
+system.</p>
+
+<p>If you want to log in with Heroku OAuth (not required in development), be
+sure to run your server
+on port 4000, as otherwise the OAuth redirect
+won&#39;t find your app!</p>
+
+<h3 id="label-Starting+a+suite+from+the+command+line">Starting a suite from the command line</h3>
+
+<p>You still need the workers running to do this. This process is very similar
+to how the
+dashboard operates but works from the command line. Each suite
+is a single rake task.</p>
+
+<p>You can see a list of available suites:</p>
+
+<pre class="code ruby"><code class="ruby">rake -T suite:</code></pre>
+
+<p>When using rake, suites can be configured using environment variables:</p>
+<ul><li>
+<p><code>BASE_URL</code> specifies the DS API endpoint being tested (defaults
+to <code>http://localhost:3000</code>)</p>
+</li><li>
+<p><code>DEVICES</code> specifies how many devices/iterations to run of each
+test (defaults to 10)</p>
+</li><li>
+<p><code>RUN_TIME</code> specifies the <em>minimum</em> run time of the test
+(defaults to 0)</p>
+</li></ul>
+
+<h3 id="label-Running+a+suite+synchronously">Running a suite synchronously</h3>
+
+<p>If you&#39;d like to run the tests synchronously on your local machine, you
+can
+open a ruby console with the suite loaded and run tests by hand.
+This
+does <strong>not</strong> require that workers are running.</p>
+
+<pre class="code ruby"><code class="ruby">rails console
+&gt; session = Deathstare::TestSession.create base_url:&#39;http://localhost:3000&#39;,  devices:10
+&gt; # you&#39;ll need this whenever you reset your session cache or want more devices:
+&gt; session.initialize_devices
+&gt; # run a whole suite...
+&gt; MySuite.new.perform(test_session_id:session.id)
+&gt; # or run a single test
+&gt; MySuite.new.perform(test_session_id:session.id, name:&#39;it can hit the home page&#39;)</code></pre>
+
+<h3 id="label-Updating+Deathstare">Updating Deathstare</h3>
+
+<p>To update the Deathstare dependency in development, make sure your
+Deathstare changes
+are <em>committed AND pushed</em>, then:</p>
+
+<pre class="code ruby"><code class="ruby">bundle update --source deathstar
+git add Gemfile.lock
+git commit -m &#39;Update deathstar dependency.&#39;</code></pre>
+
+<p>This will update the Gemfile.lock with the latest revision and force an
+update on deploy.</p>
+
+<h2 id="label-A+note+about+Session+and+Device+caching">A note about Session and Device caching</h2>
+
+<p>Deathstare pre-generates and caches devices and sessions in
+<code>ClientDevice</code> records. In cases
+where changes are made to
+upstream session creation and/or data is deleted/reset, it may
+be necessary
+to clear the session/device cache. You should try this first if you&#39;re
+having
+mysterious problems with login during your test run. To clear the
+cache from the command line:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_rake'>rake</span> <span class='label'>sessions:</span><span class='id identifier rubyid_reset'>reset</span></code></pre>
+
+<p>By default this operates on <code>http://localhost:3000</code>. To use
+another end point, you must specify it
+explicitly in the environment as
+<code>BASE_URL</code>.</p>
+</div></div>
+
+    <div id="footer">
+  Generated on Mon Feb  3 11:53:34 2014 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.3 (ruby-2.0.0).
+</div>
+
+  </body>
+</html>
